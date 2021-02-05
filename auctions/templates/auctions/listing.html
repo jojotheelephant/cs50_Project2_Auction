@@ -1,0 +1,121 @@
+{% extends "auctions/layout.html" %} {% block body %}
+
+<!-- message if needed -->
+{% if message %}
+<div>{{ message }}</div>
+{% endif %}
+
+<!-- listing closed warning tag (unique for winner)-->
+{% if not listings.active and useriswinneruser %}
+<h2 class="bg-success" style="margin: 30px">Congratulations! You have won this bid.</h2>
+{% elif not listings.active %}
+<h2 class="bg-warning" style="margin: 30px">This listing has closed.</h2>
+{% endif %}
+
+<!-- listing info w/watchlist button -->
+
+<div class="m-2" style="display: flex">
+    <h2 style="margin-left: 20px">{{listings.product_name}}</h2>
+    <form action="{% url 'listing' listings.id %}" method="POST" style="margin-left: 20px; margin-top: 5px">
+        {% csrf_token %} {% if not userwatching %}
+        <button type="submit" name="button" value="watchlist" class="btn btn-primary btn-sm">+ Watchlist</button>
+        {% else %}
+        <button type="submit" name="button" value="unwatchlist" class="btn btn-primary btn-sm">- Watchlist</button>
+        {% endif %}
+    </form>
+    <p style="margin-left: 20px; margin-top: 7px">There are currently ({{numofwatchers}}) watching this listing</p>
+</div>
+
+<div style="display: flex">
+    <img src="{{listings.image}}" alt="{{listings.product_name}}" width="200px" height="200px" style="margin: 20px" />
+    <div style="display: flex; flex-direction: column; margin-top: 20px" class="col-md-10">
+        {% if highestbid.value > listings.price %}
+        <h3>Highest Bid: ${{highestbid.value}}</h3>
+        {% else %}
+        <h3>Current Price: ${{listings.price}}</h3>
+        {% endif %}
+        <p style="padding-top: 20px">{{listings.description}}</p>
+    </div>
+</div>
+
+<div style="margin-left: 20px">
+    <p>This listing was posted by: <strong>{{listings.lister_user.username}}</strong></p>
+</div>
+
+<!-- open close listing button (lister_user priviledge) -->
+{% if userislisteruser %}
+<form action="{% url 'listing' listings.id %}" method="POST" style="margin-left: 20px; margin-top: 5px">
+    {% csrf_token %} {% if listings.active %}
+    <button type="submit" name="button" value="closelisting" class="btn btn-danger btn-sm">Close Listing</button>
+    {% else %}
+    <button type="submit" name="button" value="openlisting" class="btn btn-info btn-sm">Open Listing</button>
+    {% endif %}
+</form>
+{% else %} {% endif %}
+
+<hr />
+
+<!-- Bid -->
+<div style="margin-left: 20px">
+    <h3>Bid</h3>
+
+    <!-- bid message -->
+    {% if bidmessage %}
+    <div>
+        <h2 class="bg-warning" style="margin: 30px">{{ bidmessage }}</h2>
+    </div>
+    {% endif %}
+
+    <!-- bid history -->
+    {% if bidscount >= 1 %}
+    <div style="margin-bottom: 5px"><strong>Bid History ({{bidscount}}):</strong></div>
+    {% for bid in bids %}
+    <ul>
+        <li>${{bid.value}} - {{bid.user.username}} ({{bid.date_bid}})</li>
+    </ul>
+    {% endfor %} {% endif %}
+
+    <!-- place bid -->
+    {% if listings.active %}
+    <div>
+        <strong>Place your bid:</strong>
+        <form action="{% url 'listing' listings.id %}" method="post" style="width: 400px">
+            {% csrf_token %}{{bidform.as_p}}
+            <input class="btn btn-primary" name="button" type="submit" value="Submit Bid" />
+        </form>
+    </div>
+    {% else %}
+    <div><strong>This listing is closed</strong></div>
+    {% endif %}
+</div>
+
+<hr />
+
+<!-- Comments -->
+<div style="margin-left: 20px; margin-bottom: 60px">
+    <h3 style="margin-bottom: 20px">Comments</h3>
+
+    <!-- loop through all comments-->
+    {% if comments %} {% for comment in comments %}
+    <div class="media" style="margin: 15px">
+        <div class="media-left">
+            <img
+                src="https://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
+                class="media-object"
+                style="width: 60px"
+            />
+        </div>
+        <div class="media-body" style="margin-left: 15px">
+            <p class="media-heading"><strong>{{comment.user.username}} - {{comment.date_posted}}</strong></p>
+            <p>{{comment.comment}}</p>
+        </div>
+    </div>
+    {% endfor %} {% else %}
+    <p><strong>Be first to post a comment</strong></p>
+    {% endif %}
+    <form action="{% url 'listing' listings.id %}" method="post" style="width: 400px">
+        {% csrf_token %}{{commentform.as_p}}
+        <input class="btn btn-primary" name="button" type="submit" value="Post Comment" />
+    </form>
+</div>
+{% endblock %}

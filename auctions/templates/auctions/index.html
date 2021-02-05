@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %} {% block body %}
+<h2>Active Listings ({{totallistings}})</h2>
+{% for listing in listings %}
+<div class="index-listing">
+    <hr />
+    <div style="display: flex">
+        <a href="{% url 'listing' listing.id %}">
+            <img
+                src="{{listing.image}}"
+                alt="{{listing.product_name}}"
+                width="200px"
+                height="200px"
+                style="margin: 20px"
+            />
+        </a>
+        <div style="display: flex; flex-direction: column; margin-top: 20px" class="col-md-10">
+            <a href="{% url 'listing' listing.id %}">
+                <h3>{{listing.product_name}}: ${{listing.price}}</h3>
+            </a>
+            <p>Listed by: {{listing.lister_user}}</p>
+            <p>{{listing.description}}</p>
+        </div>
+    </div>
+</div>
+{% endfor %} {% endblock %}

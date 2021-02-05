@@ -1,0 +1,45 @@
+{% extends "auctions/layout.html" %} {% block body %}
+
+<!-- if categories -->
+{% if categories %}
+<h2 style="margin: 20px">Categories</h2>
+
+<ul>
+    {% for category in categories %}
+    <li>
+        <a href="{% url 'category' category.0 %}"><p>{{category.1}}</p></a>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- if categorydict -->
+{% elif categorydict %}
+
+<h2 style="margin: 20px">{{categorydict}}</h2>
+{% for category in categorylistings %}
+
+<div class="index-listing">
+    <hr />
+    <div style="display: flex">
+        <a href="{% url 'listing' category.id %}">
+            <img
+                src="{{category.image}}"
+                alt="{{category.product_name}}"
+                width="200px"
+                height="200px"
+                style="margin: 20px"
+            />
+        </a>
+        <div style="display: flex; flex-direction: column; margin-top: 20px" class="col-md-10">
+            <a href="{% url 'listing' category.id %}">
+                <h3>{{category.product_name}}: ${{category.price}}</h3>
+            </a>
+            <p>Listed by: {{category.lister_user}}</p>
+            <p>{{category.description}}</p>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+<!-- endif -->
+{% endif %} {% endblock %}

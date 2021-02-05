@@ -1,0 +1,31 @@
+{% extends "auctions/layout.html" %} {% block body %}
+
+<h2>My Watchlist</h2>
+
+{% if watchlist %} {% for listing in watchlist %}
+
+<div class="index-listing">
+    <hr />
+    <div style="display: flex">
+        <a href="{% url 'listing' listing.listing.id %}">
+            <img
+                src="{{listing.listing.image}}"
+                alt="{{listing.listing.product_name}}"
+                width="200px"
+                height="200px"
+                style="margin: 20px"
+            />
+        </a>
+        <div style="display: flex; flex-direction: column; margin-top: 20px" class="col-md-10">
+            <a href="{% url 'listing' listing.listing.id %}">
+                <h3>{{listing.listing.product_name}}: ${{listing.listing.price}}</h3>
+            </a>
+            <p>Listed by: {{listing.listing.lister_user}}</p>
+            <p>{{listing.listing.description}}</p>
+        </div>
+    </div>
+</div>
+
+{% endfor %} {% else %}
+<p style="margin: 20px">Your watchlist is currently empty</p>
+{% endif %} {% endblock %}
